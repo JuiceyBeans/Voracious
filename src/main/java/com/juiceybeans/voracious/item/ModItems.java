@@ -16,7 +16,7 @@ public class ModItems {
         return Registry.register(Registries.ITEM, new Identifier(Voracious.MOD_ID, name), item);
     }
 
-    public static final Item MOUTH = registerItem("mouth", new MouthItem(new FabricItemSettings().maxCount(1).food(ModFoodComponents.MOUTH)));
+    public static final Item MOUTH = registerItem("mouth", new MouthItem(new FabricItemSettings().maxCount(1)));
 
     public static void addToItemGroup(RegistryKey<ItemGroup> group, Item item) {
         ItemGroupEvents.modifyEntriesEvent(group).register(entries -> entries.add(item));
