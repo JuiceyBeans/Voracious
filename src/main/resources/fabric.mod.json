@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "voracious",
+  "version": "${version}",
+  "name": "Voracious 2",
+  "description": "Go, my child. Consume the world.",
+  "authors": ["JuiceyBeans"],
+  "contact": {
+    "homepage": "https://github.com/JuiceyBeans/Voracious",
+    "issues": "https://github.com/JuiceyBeans/Voracious/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/voracious/icon.png",
+  "environment": "*",
+  "entrypoints": {
+        "main": [
+      "com.juiceybeans.voracious.Voracious"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
