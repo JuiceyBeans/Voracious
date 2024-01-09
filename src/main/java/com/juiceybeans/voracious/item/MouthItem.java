@@ -45,7 +45,7 @@ public class MouthItem extends Item {
             hp += target.getHealth();
             Voracious.LOGGER.info("[DEBUG] Right clicked an entity", hp);
             target.kill();
-            player.heal(hp);
+            player.heal(hp/2);
             player.getWorld().playSound(player, player.getBlockPos(), SoundEvents.ENTITY_GENERIC_EAT, SoundCategory.PLAYERS);
 
         }
