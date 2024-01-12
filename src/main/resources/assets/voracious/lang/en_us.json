@@ -2,5 +2,7 @@
   "item.voracious.mouth": "Mouth",
   "tooltip.voracious.mouth": "§cI have a mouth and I must use it.",
   "message.voracious.nom": "Nom nom nom.",
-  "message.voracious.chew": "Chew your food first!"
+  "message.voracious.chew": "Finish chewing your food first!",
+  "message.voracious.bat": "C'mon, don't yall remember 2020?",
+  "message.voracious.ow": "Oof ouch my teeth. Maybe I shouldn't bite something this hard..."
 }

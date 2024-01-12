@@ -3,11 +3,14 @@ package com.juiceybeans.voracious.item;
 import com.juiceybeans.voracious.Voracious;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.damage.DamageSources;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.PassiveEntity;
-import net.minecraft.entity.passive.SheepEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.*;
+import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.FoodComponent;
 import net.minecraft.item.Item;
@@ -39,29 +42,57 @@ public class MouthItem extends Item {
     @Override
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity player, LivingEntity target, Hand hand) {
 
-        Voracious.LOGGER.info("[DEBUG] Right clicked an entity", hp);
-
-        /*if (stack.hasNbt()) {
-            hp = stack.getNbt().getFloat("voracious.stored_hp");
-            stack.setNbt(new NbtCompound());
-        };*/
-
-        if ((target instanceof LivingEntity) & (player.getWorld().isClient())) {
+        if (player.getWorld().isClient()) {
             if (player.getItemCooldownManager().isCoolingDown(ModItems.MOUTH)) {
                 player.sendMessage(Text.translatable("message.voracious.chew"));
             }
             if (!(player.getItemCooldownManager().isCoolingDown(ModItems.MOUTH))) {
-                player.sendMessage(Text.translatable("message.voracious.nom"));
+                if ((target instanceof IronGolemEntity) || (target instanceof TurtleEntity) || (target instanceof AbstractSkeletonEntity) || (target instanceof SkeletonHorseEntity)) {
+                    player.sendMessage(Text.translatable("message.voracious.ow"));
+                } else if (target instanceof BatEntity) {
+                    player.sendMessage(Text.translatable("message.voracious.bat"));
+                } else {
+                    player.sendMessage(Text.translatable("message.voracious.nom"));
+                }
             }
         }
 
-        if ((target instanceof LivingEntity) & !(player.getItemCooldownManager().isCoolingDown(ModItems.MOUTH))) {
-            hp += target.getHealth();
-            target.kill();
-            player.getServer().getCommandManager().execute(, "kill @e[type=item]");
-            player.heal(hp/2);
-            player.getWorld().playSound(player, player.getBlockPos(), SoundEvents.ENTITY_GENERIC_EAT, SoundCategory.PLAYERS);
-            player.getItemCooldownManager().set(this, 1200);
+        if (!(player.getWorld().isClient())) {
+            if (!(player.getItemCooldownManager().isCoolingDown(ModItems.MOUTH))) {
+                hp += target.getHealth();
+
+                if ((target instanceof IronGolemEntity) || (target instanceof TurtleEntity) || (target instanceof AbstractSkeletonEntity) || !(target instanceof SkeletonHorseEntity)) {
+                    player.damage(player.getDamageSources().generic(), 1F);
+                    target.damage(player.getDamageSources().playerAttack(player), 2F);
+                } else if (hp > 8F) {
+                    target.damage(player.getDamageSources().playerAttack(player), 8F);
+                }
+
+                if ((target instanceof HostileEntity) && !(target instanceof AbstractSkeletonEntity) && !(target instanceof SkeletonHorseEntity)) {
+                    player.heal(hp / 4);
+                } else if (!(target instanceof HostileEntity) && !(target instanceof SkeletonHorseEntity)) {
+                    player.heal(hp / 2);
+                }
+
+                player.getWorld().playSound(player, player.getBlockPos(), SoundEvents.ENTITY_GENERIC_EAT, SoundCategory.PLAYERS);
+                player.getItemCooldownManager().set(this, 20);
+
+                if ((target instanceof ZombieEntity) || (target instanceof SpiderEntity) || (target instanceof SkeletonEntity) || (target instanceof ZoglinEntity) || (target instanceof ZombieHorseEntity) || (target instanceof BatEntity) || (target instanceof ChickenEntity) || (target instanceof ParrotEntity)) {
+                    Voracious.LOGGER.info("[DEBUG] Applying poison");
+                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 200, 1), target);
+                }
+                if (target instanceof PufferfishEntity) {
+                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 300, 0), target);
+                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 300, 1), target);
+                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 300, 2), target);
+                }
+                if (target instanceof WitherSkeletonEntity) {
+                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 200, 0), target);
+                }
+                if (target instanceof WitherEntity) {
+                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 200, 2), target);
+                }
+            }
         }
         return ActionResult.PASS;
     }
@@ -71,16 +102,4 @@ public class MouthItem extends Item {
         tooltip.add(Text.translatable("tooltip.voracious.mouth"));
         super.appendTooltip(stack, world, tooltip, context);
     }
-
-    /*String HP = Float.toString(hp);
-    private void addNbtToMouth(PlayerEntity player, ItemStack stack) {
-        NbtCompound nbtData = new NbtCompound();
-        nbtData.putString("voracious.stored_hp", "HP stored: " + HP);
-
-    }*/
-
-    int stored_hp = 0;
-    public final FoodComponent MouthItem = new FoodComponent.Builder()
-            .hunger(stored_hp)
-            .build();
 }
